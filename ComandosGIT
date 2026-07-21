@@ -1,0 +1,15 @@
+Comandos de GIT
+
+--Por Primera Vez ------
+git init
+git remote add origin SustituirPorLaURLDelRepositorio
+git add . 
+git commit -m "Creado el repositorio"
+git push origin master
+
+----Despues----
+git pull
+
+git add .
+git commit -m "Que es lo que hice"
+git push origin master

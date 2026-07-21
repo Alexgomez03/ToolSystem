@@ -1,0 +1,60 @@
+package tablas;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.table.AbstractTableModel;
+
+import modelo.VentaModelo;
+import util.FechaUtil;
+
+public class ModeloTablaVenta extends AbstractTableModel {
+
+	private String[] columnas = {"Código", "Fecha", "Cliente", "Total", "Estado"};
+	List<VentaModelo> lista = new ArrayList<VentaModelo>();
+
+	public void setLista(List<VentaModelo> lista) {
+		this.lista = lista;
+		fireTableDataChanged();
+	}
+
+	@Override
+	public int getRowCount() {
+		return lista.size();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return columnas.length;
+	}
+
+	@Override
+	public String getColumnName(int posicion) {
+		return columnas[posicion];
+	}
+
+	@Override
+	public Object getValueAt(int fila, int columna) {
+		switch (columna) {
+		case 0:
+			return lista.get(fila).getId();
+		case 1:
+			return lista.get(fila).getFecha() != null ? FechaUtil.fechaAString(lista.get(fila).getFecha()) : "";
+		case 2:
+			return lista.get(fila).getCliente() != null
+					? lista.get(fila).getCliente().getNombre() + " " + lista.get(fila).getCliente().getApellido()
+					: "";
+		case 3:
+			return lista.get(fila).getTotal();
+		case 4:
+			return Boolean.TRUE.equals(lista.get(fila).getAnulada()) ? "Anulada" : "Vigente";
+		default:
+			return null;
+		}
+	}
+
+	public VentaModelo getRegistro(int fila) {
+		return lista.get(fila);
+	}
+
+}
