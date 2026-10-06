@@ -38,9 +38,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>jasperreports</groupId>
+			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
-			<version>3.5.3</version>
+			<version>6.20.6</version>
 			<scope>compile</scope>
 		</dependency>
 

@@ -6,23 +6,27 @@ import java.util.Map;
 
 import dao.CategoriaDAO;
 import dao.ClienteDAO;
+import dao.FuncionarioDAO;
 import dao.MarcaDAO;
 import dao.ProductoDAO;
 import dao.ProveedorDAO;
+import dao.UsuarioDAO;
 import modelo.CategoriaModelo;
 import modelo.ClienteModelo;
+import modelo.FuncionarioModelo;
 import modelo.MarcaModelo;
 import modelo.ProductoModelo;
 import modelo.ProveedorModelo;
+import modelo.UsuarioModelo;
 
-/**
- * Clase utilitaria para poblar la base de datos con datos de ejemplo
- * correspondientes a una ferretería (categorías, marcas, productos,
- * proveedores y clientes).
- *
- * Ejecutar una sola vez, con la base de datos ya creada/actualizada
- * por Hibernate (hbm2ddl.auto = update).
- */
+
+ // Clase utilitaria para poblar la base de datos con datos de ejemplo
+ // correspondientes a una ferretería (categorías, marcas, productos,
+ // proveedores y clientes).
+ 
+ // Ejecutar una sola vez, con la base de datos ya creada/actualizada
+ // por Hibernate (hbm2ddl.auto = update).
+ 
 public class CargaInicial {
 
 	public static void main(String[] args) {
@@ -32,8 +36,10 @@ public class CargaInicial {
 			cargarProveedores();
 			cargarClientes();
 			cargarProductos(categorias, marcas);
+			cargarFuncionariosYUsuarios();
 
 			System.out.println("Carga inicial de datos de la ferretería finalizada con éxito.");
+			System.out.println("Usuario administrador: admin / admin123 (¡cambiar esta contraseña después del primer ingreso!)");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -111,6 +117,7 @@ public class CargaInicial {
 		p1.setCorreo("ventas@ferreteradeleste.com.py");
 		p1.setDireccion("Av. Mariscal López 1234, Asunción");
 		p1.setFechaRegistro(LocalDate.now());
+		p1.setEstado(true);
 		dao.guardar(p1);
 
 		ProveedorModelo p2 = new ProveedorModelo();
@@ -121,6 +128,7 @@ public class CargaInicial {
 		p2.setCorreo("contacto@herraconstru.com.py");
 		p2.setDireccion("Ruta 2 Km 15, San Lorenzo");
 		p2.setFechaRegistro(LocalDate.now());
+		p2.setEstado(true);
 		dao.guardar(p2);
 
 		ProveedorModelo p3 = new ProveedorModelo();
@@ -131,6 +139,7 @@ public class CargaInicial {
 		p3.setCorreo("pedidos@pinturasur.com.py");
 		p3.setDireccion("Av. Eusebio Ayala 2500, Fernando de la Mora");
 		p3.setFechaRegistro(LocalDate.now());
+		p3.setEstado(true);
 		dao.guardar(p3);
 	}
 
@@ -148,6 +157,7 @@ public class CargaInicial {
 		c1.setDireccion("Barrio Obrero, Asunción");
 		c1.setFechaNacimiento(LocalDate.of(1985, 4, 12));
 		c1.setFechaRegistro(LocalDate.now());
+		c1.setEstado(true);
 		dao.guardar(c1);
 
 		ClienteModelo c2 = new ClienteModelo();
@@ -159,6 +169,7 @@ public class CargaInicial {
 		c2.setDireccion("Villa Elisa");
 		c2.setFechaNacimiento(LocalDate.of(1990, 9, 30));
 		c2.setFechaRegistro(LocalDate.now());
+		c2.setEstado(true);
 		dao.guardar(c2);
 
 		ClienteModelo c3 = new ClienteModelo();
@@ -170,6 +181,7 @@ public class CargaInicial {
 		c3.setDireccion("Ñemby");
 		c3.setFechaNacimiento(null);
 		c3.setFechaRegistro(LocalDate.now());
+		c3.setEstado(true);
 		dao.guardar(c3);
 	}
 
@@ -255,6 +267,58 @@ public class CargaInicial {
 		producto.setCategoria(categoria);
 		producto.setMarca(marca);
 		dao.guardar(producto);
+	}
+
+	// ==================== FUNCIONARIOS Y USUARIOS ====================
+
+	
+	 // Crea un funcionario administrador y uno vendedor, cada uno con su
+	 // usuario de acceso al sistema. Sin esto, después de agregar el login
+	 // nadie podría entrar a la aplicación en una base recién creada.
+	 
+	 // Las contraseñas de ejemplo son deliberadamente simples para poder
+	 // ingresar la primera vez; se debería crear un usuario propio y
+	 // deshabilitar (o al menos cambiarle la contraseña a) "admin" en un
+	 // entorno real.
+	 
+	private static void cargarFuncionariosYUsuarios() throws Exception {
+		FuncionarioDAO funcionarioDAO = new FuncionarioDAO();
+
+		FuncionarioModelo administrador = new FuncionarioModelo();
+		administrador.setNombre("Administrador");
+		administrador.setApellido("del Sistema");
+		administrador.setDocumento("0000001");
+		administrador.setCargo("Administrador");
+		administrador.setFechaIngreso(LocalDate.now());
+		administrador.setEstado(true);
+		funcionarioDAO.guardar(administrador);
+
+		FuncionarioModelo vendedor = new FuncionarioModelo();
+		vendedor.setNombre("Juan");
+		vendedor.setApellido("Vendedor");
+		vendedor.setDocumento("0000002");
+		vendedor.setCargo("Vendedor de Mostrador");
+		vendedor.setFechaIngreso(LocalDate.now());
+		vendedor.setEstado(true);
+		funcionarioDAO.guardar(vendedor);
+
+		UsuarioDAO usuarioDAO = new UsuarioDAO();
+
+		crearUsuario(usuarioDAO, "admin", "admin123", UsuarioModelo.Rol.ADMINISTRADOR, administrador);
+		crearUsuario(usuarioDAO, "vendedor", "vendedor123", UsuarioModelo.Rol.VENDEDOR, vendedor);
+	}
+
+	private static void crearUsuario(UsuarioDAO dao, String nombreUsuario, String password, UsuarioModelo.Rol rol,
+			FuncionarioModelo funcionario) throws Exception {
+		String salt = PasswordUtil.generarSalt();
+		UsuarioModelo usuario = new UsuarioModelo();
+		usuario.setUsuario(nombreUsuario);
+		usuario.setSalt(salt);
+		usuario.setPasswordHash(PasswordUtil.hash(password, salt));
+		usuario.setRol(rol);
+		usuario.setFuncionario(funcionario);
+		usuario.setEstado(true);
+		dao.guardar(usuario);
 	}
 
 }

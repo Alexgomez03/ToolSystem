@@ -63,6 +63,7 @@ public class ProveedorController implements InterfaceABM {
 		this.vista.getTfTelefono().setEnabled(false);
 		this.vista.getTfCorreo().setEnabled(false);
 		this.vista.getTfDireccion().setEnabled(false);
+		this.vista.getCbEstado().setEnabled(false);
 
 		this.vista.getTfFechaRegistro().setValue(null);
 		this.vista.getTfRazonSocial().setText("");
@@ -71,6 +72,7 @@ public class ProveedorController implements InterfaceABM {
 		this.vista.getTfTelefono().setText("");
 		this.vista.getTfCorreo().setText("");
 		this.vista.getTfDireccion().setText("");
+		this.vista.getCbEstado().setSelected(false);
 		proveedor = null;
 	}
 
@@ -89,9 +91,11 @@ public class ProveedorController implements InterfaceABM {
 		this.vista.getTfTelefono().setEnabled(true);
 		this.vista.getTfCorreo().setEnabled(true);
 		this.vista.getTfDireccion().setEnabled(true);
+		this.vista.getCbEstado().setEnabled(true);
 
 		proveedor = new ProveedorModelo();
 		this.vista.getTfFechaRegistro().setText(FechaUtil.fechaAString(LocalDate.now()));
+		this.vista.getCbEstado().setSelected(true);
 	}
 
 	private void seleccionarRegistro() {
@@ -108,6 +112,7 @@ public class ProveedorController implements InterfaceABM {
 		this.vista.getTfTelefono().setText(proveedor.getTelefono());
 		this.vista.getTfCorreo().setText(proveedor.getCorreo());
 		this.vista.getTfDireccion().setText(proveedor.getDireccion());
+		this.vista.getCbEstado().setSelected(!Boolean.FALSE.equals(proveedor.getEstado()));
 
 		this.vista.getBtnNuevo().setEnabled(false);
 		this.vista.getBtnEditar().setEnabled(true);
@@ -123,6 +128,7 @@ public class ProveedorController implements InterfaceABM {
 		this.vista.getTfTelefono().setEnabled(true);
 		this.vista.getTfCorreo().setEnabled(true);
 		this.vista.getTfDireccion().setEnabled(true);
+		this.vista.getCbEstado().setEnabled(true);
 
 		this.vista.getBtnNuevo().setEnabled(false);
 		this.vista.getBtnEditar().setEnabled(false);
@@ -148,6 +154,7 @@ public class ProveedorController implements InterfaceABM {
 		proveedor.setTelefono(this.vista.getTfTelefono().getText());
 		proveedor.setCorreo(this.vista.getTfCorreo().getText());
 		proveedor.setDireccion(this.vista.getTfDireccion().getText());
+		proveedor.setEstado(this.vista.getCbEstado().isSelected());
 
 		try {
 			dao.guardar(proveedor);
@@ -155,6 +162,7 @@ public class ProveedorController implements InterfaceABM {
 			estadoInicial();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se pudo guardar el proveedor. Verifique que el RUC no esté repetido.");
 		}
 	}
 
@@ -172,6 +180,9 @@ public class ProveedorController implements InterfaceABM {
 				cargarTabla("");
 			} catch (Exception e) {
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+						"No se pudo eliminar el proveedor. Puede que tenga compras asociadas; en ese caso, "
+								+ "desmarque \"Activo\" y guarde para darlo de baja en vez de eliminarlo.");
 			}
 		}
 	}

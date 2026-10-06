@@ -9,7 +9,7 @@ import modelo.ProveedorModelo;
 
 public class ModeloTablaProveedor extends AbstractTableModel {
 
-	private String[] columnas = {"Código", "Razón Social", "RUC", "Contacto"};
+	private String[] columnas = {"Código", "Razón Social", "RUC", "Contacto", "Estado"};
 	List<ProveedorModelo> lista = new ArrayList<ProveedorModelo>();
 
 	public void setLista(List<ProveedorModelo> lista) {
@@ -45,6 +45,8 @@ public class ModeloTablaProveedor extends AbstractTableModel {
 		case 3:
 			return lista.get(fila).getTelefono() != null ? lista.get(fila).getTelefono()
 					: lista.get(fila).getCorreo();
+		case 4:
+			return Boolean.FALSE.equals(lista.get(fila).getEstado()) ? "Inactivo" : "Activo";
 		default:
 			return null;
 		}

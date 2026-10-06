@@ -23,4 +23,17 @@ public class ProveedorDAO extends GenericDAO<ProveedorModelo> {
 		}
 	}
 
+	
+	 // Solo proveedores activos (estado = true o sin cargar, por
+	 // compatibilidad con registros creados antes de este campo). Se usa
+	 // para poblar el combo de Proveedor al registrar una compra nueva.
+	 
+	public List<ProveedorModelo> buscarActivos() {
+		try (Session session = getSession()) {
+			String hql = "FROM tb_proveedores WHERE (estado IS NULL OR estado = true) ORDER BY razonSocial";
+			Query<ProveedorModelo> query = session.createQuery(hql, ProveedorModelo.class);
+			return query.getResultList();
+		}
+	}
+
 }

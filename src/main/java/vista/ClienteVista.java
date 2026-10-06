@@ -2,6 +2,7 @@ package vista;
 
 import java.awt.EventQueue;
 
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
@@ -23,6 +24,7 @@ public class ClienteVista extends JDialogGenerico {
 	private JtextFieldGenerico tfTelefono;
 	private JtextFieldGenerico tfCorreo;
 	private JtextFieldGenerico tfDireccion;
+	private JCheckBox cbEstado;
 
 	/**
 	 * Launch the application.
@@ -123,7 +125,15 @@ public class ClienteVista extends JDialogGenerico {
 		tfDireccion = new JtextFieldGenerico();
 		tfDireccion.setBounds(162, 391, 343, 25);
 		getPanelFormulario().add(tfDireccion);
-		
+
+		JLabelGenerico lblgnrcEstado = new JLabelGenerico((String) null);
+		lblgnrcEstado.setText("Estado:");
+		lblgnrcEstado.setBounds(10, 440, 142, 25);
+		getPanelFormulario().add(lblgnrcEstado);
+
+		cbEstado = new JCheckBox("Activo");
+		cbEstado.setBounds(162, 440, 150, 25);
+		getPanelFormulario().add(cbEstado);
 
 	}
 
@@ -162,6 +172,9 @@ public class ClienteVista extends JDialogGenerico {
 	public JtextFieldGenerico getTfDireccion() {
 		return tfDireccion;
 	}
-	
-	
+
+	public JCheckBox getCbEstado() {
+		return cbEstado;
+	}
+
 }

@@ -26,6 +26,11 @@ public class ProductoModelo {
 	@Column(nullable = false)
 	private Double stock;
 	
+	// Umbral para alertar faltantes en el Control de Stock; queda null si
+	// el producto no tiene un mínimo definido (no se alerta en ese caso).
+	@Column
+	private Double stockMinimo;
+	
 	@Column(nullable = false)
 	private String unidadMedida;
 	
@@ -78,6 +83,14 @@ public class ProductoModelo {
 
 	public void setStock(Double stock) {
 		this.stock = stock;
+	}
+
+	public Double getStockMinimo() {
+		return stockMinimo;
+	}
+
+	public void setStockMinimo(Double stockMinimo) {
+		this.stockMinimo = stockMinimo;
 	}
 
 	public String getUnidadMedida() {

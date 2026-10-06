@@ -20,6 +20,9 @@ public class MarcaController implements InterfaceABM {
 	private List<MarcaModelo> marcas;
 	private ModeloTablaMarca tabla;
 
+	// Esto arranca todo apenas se abre la pantalla: prepara la tabla,
+	// trae la lista de marcas ya cargadas y deja todo listo para
+	// empezar a trabajar.
 	public MarcaController(MarcaVista marcaVista) {
 		super();
 		this.vista = marcaVista;
@@ -32,6 +35,8 @@ public class MarcaController implements InterfaceABM {
 		setAcciones();
 	}
 
+	// Conecta el doble clic en la tabla con la acción de mostrar esa
+	// marca en el formulario.
 	private void setAcciones() {
 		this.vista.getTabla().addMouseListener(new MouseAdapter() {
 			@Override
@@ -42,11 +47,14 @@ public class MarcaController implements InterfaceABM {
 		});
 	}
 
+	// Trae de la base las marcas que coinciden con el filtro escrito y
+	// las muestra en la tabla.
 	private void cargarTabla(String filtro) {
 		marcas = dao.buscarPorFiltro(filtro);
 		tabla.setLista(marcas);
 	}
 
+	// Deja la pantalla como recién abierta: todo bloqueado y vacío.
 	private void estadoInicial() {
 		this.vista.getBtnNuevo().setEnabled(true);
 		this.vista.getBtnEditar().setEnabled(false);
@@ -62,6 +70,8 @@ public class MarcaController implements InterfaceABM {
 		marca = null;
 	}
 
+	// Se ejecuta al tocar "Nuevo": habilita el formulario para cargar
+	// una marca desde cero, con "Activo" tildado de entrada.
 	@Override
 	public void nuevo() {
 		this.vista.getBtnNuevo().setEnabled(false);
@@ -77,6 +87,8 @@ public class MarcaController implements InterfaceABM {
 		this.vista.getCbEstado().setSelected(true);
 	}
 
+	// Al hacer doble clic en una fila, muestra esa marca en el
+	// formulario para poder verla o editarla.
 	private void seleccionarRegistro() {
 		int fila = this.vista.getTabla().getSelectedRow();
 		if (fila < 0)
@@ -91,6 +103,8 @@ public class MarcaController implements InterfaceABM {
 		this.vista.getBtnEliminar().setEnabled(true);
 	}
 
+	// Habilita el formulario para poder cambiar los datos de la marca
+	// que está seleccionada.
 	@Override
 	public void editar() {
 		this.vista.getTfNombre().setEnabled(true);
@@ -102,14 +116,22 @@ public class MarcaController implements InterfaceABM {
 		this.vista.getBtnEliminar().setEnabled(false);
 	}
 
+	// Revisa que el nombre no esté vacío ni repetido, y si está todo
+	// bien, guarda la marca en la base de datos.
 	@Override
 	public void guardar() {
-		if (this.vista.getTfNombre().getText().isEmpty()) {
+		String nombre = this.vista.getTfNombre().getText().trim();
+
+		if (nombre.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "El nombre es un campo obligatorio");
 			return;
 		}
+		if (dao.existeNombre(nombre, marca.getId())) {
+			JOptionPane.showMessageDialog(null, "Ya existe una marca con ese nombre");
+			return;
+		}
 
-		marca.setNombre(this.vista.getTfNombre().getText());
+		marca.setNombre(nombre);
 		marca.setEstado(this.vista.getCbEstado().isSelected());
 
 		try {
@@ -118,9 +140,14 @@ public class MarcaController implements InterfaceABM {
 			estadoInicial();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se pudo guardar la marca.");
 		}
 	}
 
+	// Borra definitivamente la marca seleccionada, después de preguntar
+	// si está seguro. Si tiene productos asociados, la base de datos no
+	// va a dejar borrarla (para eso está la baja lógica: desmarcar
+	// "Activo" y guardar, en vez de eliminar).
 	@Override
 	public void eliminar() {
 		if (marca == null)
@@ -140,6 +167,8 @@ public class MarcaController implements InterfaceABM {
 		}
 	}
 
+	// Si no había nada seleccionado, cierra la ventana. Si había algo
+	// cargado en el formulario, lo descarta y deja todo en blanco.
 	@Override
 	public void cancelar() {
 		if (marca == null)
@@ -148,6 +177,8 @@ public class MarcaController implements InterfaceABM {
 			estadoInicial();
 	}
 
+	// Se ejecuta al escribir en el buscador: vuelve a cargar la tabla
+	// filtrada con ese texto.
 	@Override
 	public void buscar() {
 		cargarTabla(vista.getTfBuscador().getText());

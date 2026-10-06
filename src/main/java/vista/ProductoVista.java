@@ -20,6 +20,7 @@ public class ProductoVista extends JDialogGenerico {
 	private JtextFieldGenerico tfDescripcion;
 	private JtextFieldGenerico tfPrecioVenta;
 	private JtextFieldGenerico tfStock;
+	private JtextFieldGenerico tfStockMinimo;
 	private JtextFieldGenerico tfUnidadMedida;
 	private JCheckBox cbEstado;
 	private JComboBox<CategoriaModelo> cbCategoria;
@@ -83,6 +84,11 @@ public class ProductoVista extends JDialogGenerico {
 		lblgnrcStock.setBounds(10, 285, 142, 25);
 		getPanelFormulario().add(lblgnrcStock);
 
+		JLabelGenerico lblgnrcStockMinimo = new JLabelGenerico((String) null);
+		lblgnrcStockMinimo.setText("Mínimo:");
+		lblgnrcStockMinimo.setBounds(344, 285, 70, 25);
+		getPanelFormulario().add(lblgnrcStockMinimo);
+
 		JLabelGenerico lblgnrcUnidadMedida = new JLabelGenerico((String) null);
 		lblgnrcUnidadMedida.setText("Unidad de Medida:");
 		lblgnrcUnidadMedida.setBounds(10, 340, 142, 25);
@@ -95,6 +101,7 @@ public class ProductoVista extends JDialogGenerico {
 
 		tfCodigo = new JtextFieldGenerico();
 		tfCodigo.setBounds(162, 28, 172, 25);
+		tfCodigo.setToolTipText("Único e inmodificable: no se puede cambiar una vez guardado el producto");
 		getPanelFormulario().add(tfCodigo);
 
 		tfDescripcion = new JtextFieldGenerico();
@@ -116,6 +123,10 @@ public class ProductoVista extends JDialogGenerico {
 		tfStock = new JtextFieldGenerico();
 		tfStock.setBounds(162, 285, 172, 25);
 		getPanelFormulario().add(tfStock);
+
+		tfStockMinimo = new JtextFieldGenerico();
+		tfStockMinimo.setBounds(414, 285, 90, 25);
+		getPanelFormulario().add(tfStockMinimo);
 
 		tfUnidadMedida = new JtextFieldGenerico();
 		tfUnidadMedida.setBounds(162, 340, 172, 25);
@@ -145,6 +156,10 @@ public class ProductoVista extends JDialogGenerico {
 
 	public JtextFieldGenerico getTfStock() {
 		return tfStock;
+	}
+
+	public JtextFieldGenerico getTfStockMinimo() {
+		return tfStockMinimo;
 	}
 
 	public JtextFieldGenerico getTfUnidadMedida() {

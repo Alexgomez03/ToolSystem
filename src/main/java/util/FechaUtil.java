@@ -51,16 +51,21 @@ public class FechaUtil {
 	
 	// ==================== LocalDate a String ==================
 	
+	// Nota (corrección): antes estos tres métodos llamaban directo a
+	// fecha.format(...) sin chequear null. Cualquier pantalla que mostrara
+	// un registro con una fecha opcional sin cargar (p. ej. un Cliente sin
+	// fecha de nacimiento) tiraba NullPointerException al doble-clic. Ahora
+	// una fecha/hora null simplemente se muestra como campo vacío.
 	public static String fechaAString(LocalDate fecha) {
-		return fecha.format(FORMATO_FECHA);
+		return fecha == null ? "" : fecha.format(FORMATO_FECHA);
 	}
 	
 	public static String horaAString(LocalTime hora) {
-		return hora.format(FORMATO_HORA);
+		return hora == null ? "" : hora.format(FORMATO_HORA);
 	}
 	
 	public static String fechaHoraAString(LocalDateTime fechaHora) {
-		return fechaHora.format(FORMATO_FECHA_HORA);
+		return fechaHora == null ? "" : fechaHora.format(FORMATO_FECHA_HORA);
 	}
 	
 	

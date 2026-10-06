@@ -67,6 +67,7 @@ public class ClienteController implements InterfaceABM {
 		this.vista.getTfCorreo().setEnabled(false);
 		this.vista.getTfDireccion().setEnabled(false);
 		this.vista.getTfTelefono().setEnabled(false);
+		this.vista.getCbEstado().setEnabled(false);
 
 		// Limpiar los campos
 		this.vista.getTfFechaRegistro().setValue(null);
@@ -77,6 +78,7 @@ public class ClienteController implements InterfaceABM {
 		this.vista.getTfCorreo().setText("");
 		this.vista.getTfDireccion().setText("");
 		this.vista.getTfTelefono().setText("");
+		this.vista.getCbEstado().setSelected(false);
 		cliente = null;
 
 	}
@@ -99,10 +101,12 @@ public class ClienteController implements InterfaceABM {
 		this.vista.getTfCorreo().setEnabled(true);
 		this.vista.getTfDireccion().setEnabled(true);
 		this.vista.getTfTelefono().setEnabled(true);
+		this.vista.getCbEstado().setEnabled(true);
 
 		// Carga el campo fecha y crea el cliente
 		cliente = new ClienteModelo();
 		this.vista.getTfFechaRegistro().setText(FechaUtil.fechaAString(LocalDate.now()));
+		this.vista.getCbEstado().setSelected(true);
 
 	}
 
@@ -120,6 +124,9 @@ public class ClienteController implements InterfaceABM {
 		this.vista.getTfCorreo().setText(cliente.getCorreo());
 		this.vista.getTfFechaNacimiento().setText(FechaUtil.fechaAString(cliente.getFechaNacimiento()));
 		this.vista.getTfDireccion().setText(cliente.getDireccion());
+		// Los registros creados antes de agregar este campo quedan null en
+		// la base; se los trata como activos por defecto.
+		this.vista.getCbEstado().setSelected(!Boolean.FALSE.equals(cliente.getEstado()));
 
 		this.vista.getBtnNuevo().setEnabled(false);
 		this.vista.getBtnEditar().setEnabled(true);
@@ -137,6 +144,7 @@ public class ClienteController implements InterfaceABM {
 		this.vista.getTfCorreo().setEnabled(true);
 		this.vista.getTfDireccion().setEnabled(true);
 		this.vista.getTfTelefono().setEnabled(true);
+		this.vista.getCbEstado().setEnabled(true);
 		
 		this.vista.getBtnNuevo().setEnabled(false);
 		this.vista.getBtnEditar().setEnabled(false);
@@ -161,6 +169,7 @@ public class ClienteController implements InterfaceABM {
 		cliente.setTelefono(this.vista.getTfTelefono().getText());
 		cliente.setCorreo(this.vista.getTfCorreo().getText());
 		cliente.setDireccion(this.vista.getTfDireccion().getText());
+		cliente.setEstado(this.vista.getCbEstado().isSelected());
 
 		try {
 			dao.guardar(cliente);
@@ -168,6 +177,7 @@ public class ClienteController implements InterfaceABM {
 			estadoInicial();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se pudo guardar el cliente. Verifique que el documento no esté repetido.");
 		}
 
 	}
@@ -185,6 +195,9 @@ public class ClienteController implements InterfaceABM {
 				cargarTabla("");
 			} catch (Exception e) {
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(null,
+						"No se pudo eliminar el cliente. Puede que tenga ventas asociadas; en ese caso, "
+								+ "desmarque \"Activo\" y guarde para darlo de baja en vez de eliminarlo.");
 			}
 		}
 	}

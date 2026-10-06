@@ -40,9 +40,9 @@ public class JDialogGenerico extends JDialog implements ActionListener {
 		this.interfaceABM = interfaceABM;
 	}
 
-	/**
-	 * Título mostrado en la barra superior del formulario (p. ej. "Gestión de Clientes").
-	 */
+	
+	 // Título mostrado en la barra superior del formulario (p. ej. "Gestión de Clientes").
+	 
 	public void setTituloFormulario(String texto) {
 		lblTitulo.setText(texto);
 	}

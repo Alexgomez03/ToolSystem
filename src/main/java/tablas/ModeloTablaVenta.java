@@ -10,7 +10,8 @@ import util.FechaUtil;
 
 public class ModeloTablaVenta extends AbstractTableModel {
 
-	private String[] columnas = {"Código", "Fecha", "Cliente", "Total", "Estado"};
+	private String[] columnas = {"Código", "Fecha", "Cliente", "Vendedor", "Total", "Estado", "Forma de Pago",
+			"Estado de Pago"};
 	List<VentaModelo> lista = new ArrayList<VentaModelo>();
 
 	public void setLista(List<VentaModelo> lista) {
@@ -45,9 +46,20 @@ public class ModeloTablaVenta extends AbstractTableModel {
 					? lista.get(fila).getCliente().getNombre() + " " + lista.get(fila).getCliente().getApellido()
 					: "";
 		case 3:
-			return lista.get(fila).getTotal();
+			return lista.get(fila).getFuncionario() != null
+					? lista.get(fila).getFuncionario().getNombre() + " " + lista.get(fila).getFuncionario().getApellido()
+					: "";
 		case 4:
+			return lista.get(fila).getTotal();
+		case 5:
 			return Boolean.TRUE.equals(lista.get(fila).getAnulada()) ? "Anulada" : "Vigente";
+		case 6:
+			// Los registros viejos, de antes de agregar esta columna, no
+			// tienen forma de pago cargada; se muestran como "Contado"
+			// para no dejar la celda en blanco sin explicación.
+			return lista.get(fila).getFormaPago() == modelo.FormaPago.CREDITO ? "Crédito" : "Contado";
+		case 7:
+			return lista.get(fila).getEstadoPago().getTextoParaMostrar();
 		default:
 			return null;
 		}

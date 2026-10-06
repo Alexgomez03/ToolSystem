@@ -9,7 +9,7 @@ import modelo.ClienteModelo;
 
 public class ModeloTablaCliente extends AbstractTableModel {
 	
-	private String[] columnas = {"Código", "Nombre y Apellido", "Documento", "Contacto"};
+	private String[] columnas = {"Código", "Nombre y Apellido", "Documento", "Contacto", "Estado"};
 	List<ClienteModelo> lista = new ArrayList<ClienteModelo>();
 	
 	
@@ -48,6 +48,8 @@ public class ModeloTablaCliente extends AbstractTableModel {
 		case 3:
 			return lista.get(fila).getTelefono() != null ? 
 					lista.get(fila).getTelefono() : lista.get(fila).getCorreo();
+		case 4:
+			return Boolean.FALSE.equals(lista.get(fila).getEstado()) ? "Inactivo" : "Activo";
 		default:
 			return null;
 		}

@@ -20,6 +20,9 @@ public class CategoriaController implements InterfaceABM {
 	private List<CategoriaModelo> categorias;
 	private ModeloTablaCategoria tabla;
 
+	// Esto arranca todo apenas se abre la pantalla: prepara la tabla,
+	// trae la lista de categorías ya cargadas y deja todo listo para
+	// empezar a trabajar.
 	public CategoriaController(CategoriaVista categoriaVista) {
 		super();
 		this.vista = categoriaVista;
@@ -32,6 +35,8 @@ public class CategoriaController implements InterfaceABM {
 		setAcciones();
 	}
 
+	// Conecta el doble clic en la tabla con la acción de mostrar esa
+	// categoría en el formulario.
 	private void setAcciones() {
 		this.vista.getTabla().addMouseListener(new MouseAdapter() {
 			@Override
@@ -42,11 +47,14 @@ public class CategoriaController implements InterfaceABM {
 		});
 	}
 
+	// Trae de la base las categorías que coinciden con el filtro escrito
+	// y las muestra en la tabla.
 	private void cargarTabla(String filtro) {
 		categorias = dao.buscarPorFiltro(filtro);
 		tabla.setLista(categorias);
 	}
 
+	// Deja la pantalla como recién abierta: todo bloqueado y vacío.
 	private void estadoInicial() {
 		this.vista.getBtnNuevo().setEnabled(true);
 		this.vista.getBtnEditar().setEnabled(false);
@@ -62,6 +70,8 @@ public class CategoriaController implements InterfaceABM {
 		categoria = null;
 	}
 
+	// Se ejecuta al tocar "Nuevo": habilita el formulario para cargar
+	// una categoría desde cero, con "Activo" tildado de entrada.
 	@Override
 	public void nuevo() {
 		this.vista.getBtnNuevo().setEnabled(false);
@@ -77,6 +87,8 @@ public class CategoriaController implements InterfaceABM {
 		this.vista.getCbEstado().setSelected(true);
 	}
 
+	// Al hacer doble clic en una fila, muestra esa categoría en el
+	// formulario para poder verla o editarla.
 	private void seleccionarRegistro() {
 		int fila = this.vista.getTabla().getSelectedRow();
 		if (fila < 0)
@@ -91,6 +103,8 @@ public class CategoriaController implements InterfaceABM {
 		this.vista.getBtnEliminar().setEnabled(true);
 	}
 
+	// Habilita el formulario para poder cambiar los datos de la
+	// categoría que está seleccionada.
 	@Override
 	public void editar() {
 		this.vista.getTfNombre().setEnabled(true);
@@ -102,14 +116,22 @@ public class CategoriaController implements InterfaceABM {
 		this.vista.getBtnEliminar().setEnabled(false);
 	}
 
+	// Revisa que el nombre no esté vacío ni repetido, y si está todo
+	// bien, guarda la categoría en la base de datos.
 	@Override
 	public void guardar() {
-		if (this.vista.getTfNombre().getText().isEmpty()) {
+		String nombre = this.vista.getTfNombre().getText().trim();
+
+		if (nombre.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "El nombre es un campo obligatorio");
 			return;
 		}
+		if (dao.existeNombre(nombre, categoria.getId())) {
+			JOptionPane.showMessageDialog(null, "Ya existe una categoría con ese nombre");
+			return;
+		}
 
-		categoria.setNombre(this.vista.getTfNombre().getText());
+		categoria.setNombre(nombre);
 		categoria.setEstado(this.vista.getCbEstado().isSelected());
 
 		try {
@@ -118,9 +140,14 @@ public class CategoriaController implements InterfaceABM {
 			estadoInicial();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se pudo guardar la categoría.");
 		}
 	}
 
+	// Borra definitivamente la categoría seleccionada, después de
+	// preguntar si está seguro. Si tiene productos asociados, la base
+	// de datos no va a dejar borrarla (para eso está la baja lógica:
+	// desmarcar "Activo" y guardar, en vez de eliminar).
 	@Override
 	public void eliminar() {
 		if (categoria == null)
@@ -141,6 +168,8 @@ public class CategoriaController implements InterfaceABM {
 		}
 	}
 
+	// Si no había nada seleccionado, cierra la ventana. Si había algo
+	// cargado en el formulario, lo descarta y deja todo en blanco.
 	@Override
 	public void cancelar() {
 		if (categoria == null)
@@ -149,6 +178,8 @@ public class CategoriaController implements InterfaceABM {
 			estadoInicial();
 	}
 
+	// Se ejecuta al escribir en el buscador: vuelve a cargar la tabla
+	// filtrada con ese texto.
 	@Override
 	public void buscar() {
 		cargarTabla(vista.getTfBuscador().getText());

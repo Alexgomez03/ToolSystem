@@ -21,10 +21,15 @@
         
         <mapping class="modelo.CategoriaModelo"/>
         <mapping class="modelo.ClienteModelo"/>
+        <mapping class="modelo.CompraModelo"/>
+        <mapping class="modelo.DetalleCompraModelo"/>
         <mapping class="modelo.DetalleVentaModelo"/>
+        <mapping class="modelo.FuncionarioModelo"/>
         <mapping class="modelo.MarcaModelo"/>
         <mapping class="modelo.ProductoModelo"/>
         <mapping class="modelo.ProveedorModelo"/>
+        <mapping class="modelo.StockMovimientoModelo"/>
+        <mapping class="modelo.UsuarioModelo"/>
         <mapping class="modelo.VentaModelo"/>
         
     </session-factory>

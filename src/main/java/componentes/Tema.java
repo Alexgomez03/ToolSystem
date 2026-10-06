@@ -3,13 +3,13 @@ package componentes;
 import java.awt.Color;
 import java.awt.Font;
 
-/**
- * Paleta de colores y tipografías del sistema "ToolSystem".
- * Estilo industrial/ferretería: acero + naranja de seguridad.
- *
- * Se centraliza acá para que todos los componentes personalizados
- * (botones, labels, campos, diálogos) compartan una misma identidad visual.
- */
+
+ //Paleta de colores y tipografías del sistema "ToolSystem".
+ //Estilo industrial/ferretería: acero + naranja de seguridad.
+ 
+ //Se centraliza acá para que todos los componentes personalizados
+ //(botones, labels, campos, diálogos) compartan una misma identidad visual.
+ 
 public class Tema {
 
 	// Colores principales

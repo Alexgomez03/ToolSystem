@@ -9,7 +9,7 @@ import modelo.DetalleVentaModelo;
 
 public class ModeloTablaDetalleVenta extends AbstractTableModel {
 
-	private String[] columnas = {"Producto", "Cantidad", "Precio", "Subtotal"};
+	private String[] columnas = {"Código", "Producto", "Cantidad", "Precio", "Subtotal"};
 	List<DetalleVentaModelo> lista = new ArrayList<DetalleVentaModelo>();
 
 	public void setLista(List<DetalleVentaModelo> lista) {
@@ -41,12 +41,14 @@ public class ModeloTablaDetalleVenta extends AbstractTableModel {
 		DetalleVentaModelo detalle = lista.get(fila);
 		switch (columna) {
 		case 0:
-			return detalle.getProducto() != null ? detalle.getProducto().getDescripcion() : "";
+			return detalle.getProducto() != null ? detalle.getProducto().getCodigo() : "";
 		case 1:
-			return detalle.getCantidad();
+			return detalle.getProducto() != null ? detalle.getProducto().getDescripcion() : "";
 		case 2:
-			return detalle.getPrecio();
+			return detalle.getCantidad();
 		case 3:
+			return detalle.getPrecio();
+		case 4:
 			return detalle.getCantidad() * detalle.getPrecio();
 		default:
 			return null;

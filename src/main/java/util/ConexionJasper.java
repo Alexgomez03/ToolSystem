@@ -25,8 +25,16 @@ public class ConexionJasper<E> {
 		InputStream stream = ConexionJasper.class.getResourceAsStream("/jasper/"+reporte+".jrxml");
 		JasperReport report = JasperCompileManager.compileReport(stream);
 		JasperPrint print = JasperFillManager.fillReport(report, parametros, new JRBeanCollectionDataSource(lista));
-		JasperViewer viewer = new JasperViewer(print);
+		// JasperViewer es en sí mismo un JFrame; se lo usa solo para
+		// reutilizar su toolbar (imprimir, exportar a PDF, zoom, buscar) y
+		// se traslada ese contenido a nuestro JDialog modal, así el reporte
+		// queda integrado a la ventana de la aplicación en vez de abrir una
+		// ventana suelta aparte. Se oculta y descarta el frame original de
+		// inmediato para que no quede una ventana vacía de fondo.
+		JasperViewer viewer = new JasperViewer(print, false);
+		viewer.setVisible(false);
 		this.ventanaReporte.getContentPane().add(viewer.getContentPane());
+		viewer.dispose();
 	}
 	
 	

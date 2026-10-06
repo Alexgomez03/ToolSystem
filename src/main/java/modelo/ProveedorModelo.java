@@ -36,6 +36,10 @@ public class ProveedorModelo {
 	@Column
 	private LocalDate fechaRegistro;
 
+	// Baja lógica (ver la misma nota en ClienteModelo).
+	@Column
+	private Boolean estado;
+
 	public Integer getId() {
 		return id;
 	}
@@ -98,6 +102,14 @@ public class ProveedorModelo {
 
 	public void setFechaRegistro(LocalDate fechaRegistro) {
 		this.fechaRegistro = fechaRegistro;
+	}
+
+	public Boolean getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Boolean estado) {
+		this.estado = estado;
 	}
 
 }

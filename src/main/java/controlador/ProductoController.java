@@ -42,7 +42,7 @@ public class ProductoController implements InterfaceABM {
 	}
 
 	private void cargarCombos() {
-		List<CategoriaModelo> categorias = new CategoriaDAO().buscarPorFiltro("");
+		List<CategoriaModelo> categorias = new CategoriaDAO().buscarActivas();
 		DefaultComboBoxModel<CategoriaModelo> modeloCategoria = new DefaultComboBoxModel<CategoriaModelo>();
 		for (CategoriaModelo c : categorias)
 			modeloCategoria.addElement(c);
@@ -60,7 +60,7 @@ public class ProductoController implements InterfaceABM {
 			}
 		});
 
-		List<MarcaModelo> marcas = new MarcaDAO().buscarPorFiltro("");
+		List<MarcaModelo> marcas = new MarcaDAO().buscarActivas();
 		DefaultComboBoxModel<MarcaModelo> modeloMarca = new DefaultComboBoxModel<MarcaModelo>();
 		for (MarcaModelo m : marcas)
 			modeloMarca.addElement(m);
@@ -107,6 +107,7 @@ public class ProductoController implements InterfaceABM {
 		this.vista.getCbMarca().setEnabled(false);
 		this.vista.getTfPrecioVenta().setEnabled(false);
 		this.vista.getTfStock().setEnabled(false);
+		this.vista.getTfStockMinimo().setEnabled(false);
 		this.vista.getTfUnidadMedida().setEnabled(false);
 		this.vista.getCbEstado().setEnabled(false);
 
@@ -114,6 +115,7 @@ public class ProductoController implements InterfaceABM {
 		this.vista.getTfDescripcion().setText("");
 		this.vista.getTfPrecioVenta().setText("");
 		this.vista.getTfStock().setText("");
+		this.vista.getTfStockMinimo().setText("");
 		this.vista.getTfUnidadMedida().setText("");
 		this.vista.getCbEstado().setSelected(false);
 		producto = null;
@@ -133,6 +135,7 @@ public class ProductoController implements InterfaceABM {
 		this.vista.getCbMarca().setEnabled(true);
 		this.vista.getTfPrecioVenta().setEnabled(true);
 		this.vista.getTfStock().setEnabled(true);
+		this.vista.getTfStockMinimo().setEnabled(true);
 		this.vista.getTfUnidadMedida().setEnabled(true);
 		this.vista.getCbEstado().setEnabled(true);
 
@@ -152,6 +155,7 @@ public class ProductoController implements InterfaceABM {
 		this.vista.getCbMarca().setSelectedItem(buscarPorId(this.vista.getCbMarca(), producto.getMarca()));
 		this.vista.getTfPrecioVenta().setText(String.valueOf(producto.getPrecioVenta()));
 		this.vista.getTfStock().setText(String.valueOf(producto.getStock()));
+		this.vista.getTfStockMinimo().setText(producto.getStockMinimo() != null ? String.valueOf(producto.getStockMinimo()) : "");
 		this.vista.getTfUnidadMedida().setText(producto.getUnidadMedida());
 		this.vista.getCbEstado().setSelected(Boolean.TRUE.equals(producto.getEstado()));
 
@@ -162,12 +166,17 @@ public class ProductoController implements InterfaceABM {
 
 	@Override
 	public void editar() {
-		this.vista.getTfCodigo().setEnabled(true);
+		// El código no se puede tocar acá a propósito: una vez creado un
+		// producto, su código queda fijo para siempre (es su identidad
+		// única). Si hiciera falta cambiarlo, la forma correcta es dar
+		// de baja este producto y cargar uno nuevo con el código
+		// correcto.
 		this.vista.getTfDescripcion().setEnabled(true);
 		this.vista.getCbCategoria().setEnabled(true);
 		this.vista.getCbMarca().setEnabled(true);
 		this.vista.getTfPrecioVenta().setEnabled(true);
 		this.vista.getTfStock().setEnabled(true);
+		this.vista.getTfStockMinimo().setEnabled(true);
 		this.vista.getTfUnidadMedida().setEnabled(true);
 		this.vista.getCbEstado().setEnabled(true);
 
@@ -179,17 +188,29 @@ public class ProductoController implements InterfaceABM {
 
 	@Override
 	public void guardar() {
-		if (this.vista.getTfDescripcion().getText().isEmpty()) {
+		String descripcion = this.vista.getTfDescripcion().getText().trim();
+		String codigo = this.vista.getTfCodigo().getText().trim();
+
+		if (descripcion.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "La descripción es un campo obligatorio");
 			return;
 		}
-		if (this.vista.getTfCodigo().getText().isEmpty()) {
+		if (codigo.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "El código es un campo obligatorio");
+			return;
+		}
+		// El código es único y, una vez creado el producto, no se puede
+		// volver a cambiar (el campo queda bloqueado al editar), así que
+		// esta validación de duplicado solo puede dispararse al cargar
+		// un producto nuevo.
+		if (producto.getId() == null && dao.existeCodigo(codigo, null)) {
+			JOptionPane.showMessageDialog(null, "Ya existe un producto con ese código");
 			return;
 		}
 
 		Double precio;
 		Double stock;
+		Double stockMinimo = null;
 		try {
 			precio = Double.valueOf(this.vista.getTfPrecioVenta().getText().replace(",", "."));
 			stock = Double.valueOf(this.vista.getTfStock().getText().replace(",", "."));
@@ -197,13 +218,35 @@ public class ProductoController implements InterfaceABM {
 			JOptionPane.showMessageDialog(null, "El precio y el stock deben ser numéricos");
 			return;
 		}
+		if (precio < 0) {
+			JOptionPane.showMessageDialog(null, "El precio de venta no puede ser negativo");
+			return;
+		}
+		if (stock < 0) {
+			JOptionPane.showMessageDialog(null, "El stock no puede ser negativo");
+			return;
+		}
+		String textoStockMinimo = this.vista.getTfStockMinimo().getText().trim();
+		if (!textoStockMinimo.isEmpty()) {
+			try {
+				stockMinimo = Double.valueOf(textoStockMinimo.replace(",", "."));
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "El stock mínimo debe ser numérico");
+				return;
+			}
+			if (stockMinimo < 0) {
+				JOptionPane.showMessageDialog(null, "El stock mínimo no puede ser negativo");
+				return;
+			}
+		}
 
-		producto.setCodigo(this.vista.getTfCodigo().getText());
-		producto.setDescripcion(this.vista.getTfDescripcion().getText());
+		producto.setCodigo(codigo);
+		producto.setDescripcion(descripcion);
 		producto.setCategoria((CategoriaModelo) this.vista.getCbCategoria().getSelectedItem());
 		producto.setMarca((MarcaModelo) this.vista.getCbMarca().getSelectedItem());
 		producto.setPrecioVenta(precio);
 		producto.setStock(stock);
+		producto.setStockMinimo(stockMinimo);
 		producto.setUnidadMedida(this.vista.getTfUnidadMedida().getText());
 		producto.setEstado(this.vista.getCbEstado().isSelected());
 
@@ -213,6 +256,7 @@ public class ProductoController implements InterfaceABM {
 			estadoInicial();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se pudo guardar el producto.");
 		}
 	}
 
@@ -251,7 +295,10 @@ public class ProductoController implements InterfaceABM {
 
 	// Los combos se cargan una sola vez al abrir la ventana; como Hibernate
 	// puede entregar una instancia distinta a la del combo para el mismo
-	// registro, se busca por ID en lugar de por igualdad de instancia.
+	// registro, se busca por ID en lugar de por igualdad de instancia. Si
+	// el producto seleccionado tiene una categoría/marca que fue dada de
+	// baja después de cargado el combo (que solo trae activas), se agrega
+	// temporalmente para poder mostrarla igual.
 	private CategoriaModelo buscarPorId(javax.swing.JComboBox<CategoriaModelo> combo, CategoriaModelo categoria) {
 		if (categoria == null)
 			return null;
@@ -259,7 +306,8 @@ public class ProductoController implements InterfaceABM {
 			if (combo.getItemAt(i).getId().equals(categoria.getId()))
 				return combo.getItemAt(i);
 		}
-		return null;
+		combo.addItem(categoria);
+		return categoria;
 	}
 
 	private MarcaModelo buscarPorId(javax.swing.JComboBox<MarcaModelo> combo, MarcaModelo marca) {
@@ -269,7 +317,8 @@ public class ProductoController implements InterfaceABM {
 			if (combo.getItemAt(i).getId().equals(marca.getId()))
 				return combo.getItemAt(i);
 		}
-		return null;
+		combo.addItem(marca);
+		return marca;
 	}
 
 }

@@ -38,7 +38,14 @@ public class ClienteModelo {
 	
 	@Column
 	private LocalDate fechaRegistro;
-	
+
+	// Baja lógica: antes Cliente no tenía este campo y "Eliminar" era la
+	// única opción (un DELETE físico que la base rechaza si el cliente ya
+	// tiene ventas asociadas). Con "estado" se puede desactivar un cliente
+	// sin perder su historial, igual que ya funcionaba para Categoría,
+	// Marca, Producto y Funcionario.
+	@Column
+	private Boolean estado;
 
 	public Integer getId() {
 		return id;
@@ -110,6 +117,14 @@ public class ClienteModelo {
 
 	public void setFechaRegistro(LocalDate fechaRegistro) {
 		this.fechaRegistro = fechaRegistro;
+	}
+
+	public Boolean getEstado() {
+		return estado;
+	}
+
+	public void setEstado(Boolean estado) {
+		this.estado = estado;
 	}
 
 }
